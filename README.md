@@ -61,6 +61,7 @@ python run_console.py web --paper --port 18787 --no-open
 - 补齐各市场的行情、保证金与订单语义。
 - 扩展可复用的适配器、测试覆盖和本地使用说明。
 - 完善同API合约和现货之间转账，冷钱包之间转账。
+- 完善交易机器人。
 
 ## English
 
@@ -117,6 +118,8 @@ See [Development](docs/DEVELOPMENT.md) for tests and packaging.
 - Stronger account reconciliation, connection recovery and migration checks.
 - Clear market-data, margin and order semantics for each market.
 - Reusable adapters, broader tests and improved local documentation.
+-  Improve the transfer between API contracts and spot transactions, as well as the transfer between cold wallets.
+- Improve the trading robots.
 
 ## Third-party components
 
