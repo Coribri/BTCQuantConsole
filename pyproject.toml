@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "btc-quant-lab"
+version = "1.0.0"
+description = "Local trading workspace with paper trading, charts and capability-aware exchange connections"
+requires-python = ">=3.11"
+dependencies = [
+  "pandas>=2.2",
+  "numpy>=1.26",
+  "matplotlib>=3.8",
+  "requests>=2.31",
+  "fastapi>=0.115",
+  "uvicorn>=0.30",
+  "hyperliquid-python-sdk==0.24.0",
+]
+
+[project.scripts]
+btcquant = "btcquant.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["btcquant*"]
+
+[tool.setuptools.package-data]
+btcquant = ["static/*", "static/vendor/*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

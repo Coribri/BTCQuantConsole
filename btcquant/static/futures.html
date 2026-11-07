@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="/static/favicon.ico">
+  <script>
+  const accountParams = new URLSearchParams(location.search);
+  if (accountParams.get("account") === "live" && accountParams.get("pane") !== "1" && accountParams.get("window") !== "1") {
+    document.documentElement.dataset.accountMode = "live";
+  }
+  (() => { try {
+    const t = localStorage.getItem('btcquant.theme');
+    if (t === 'light') document.documentElement.dataset.theme = 'light';
+    const f = Number(localStorage.getItem('btcquant.fontScale'));
+    if (f >= 0.9 && f <= 1.3) document.documentElement.style.setProperty('--font-scale', String(f));
+  } catch (_) {} })();
+  </script>
+  <title>BTC Quant · 合约模拟</title>
+  <link rel="stylesheet" href="/static/styles.css?v=v21account">
+  <link rel="stylesheet" href="/static/pages.css?v=v21account">
+  <link rel="stylesheet" href="/static/theme.css?v=20261107-live-ui">
+  <link rel="stylesheet" href="/static/workspace.css?v=tv2">
+  <link rel="stylesheet" href="/static/research.css?v=tv2">
+  <link rel="stylesheet" href="/static/terminal.css?v=v21account">
+  <link rel="stylesheet" href="/static/layout.css?v=20261107-resize">
+<link rel="stylesheet" href="/static/help-tips.css?v=plan3">
+<link rel="stylesheet" href="/static/volume-pane.css?v=plan3">
+</head>
+<body class="subpage futures-page">
+  <div class="ambient"></div>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="mark"><img src="/static/logo.png" alt="BTC Quant"></div>
+        <div><h1>BTC QUANT</h1><p>PERPETUAL SIMULATOR</p></div>
+      </div>
+      <div class="symbol-picker">
+        <button id="symbolBtn" class="symbol-btn" title="切换交易对"><span id="symbolLabel">BTC/USDT</span><span class="caret">▾</span></button>
+        <div id="symbolMenu" class="symbol-menu hidden">
+          <button data-symbol="BTCUSDT">BTC/USDT <small>Bitcoin</small></button>
+          <button data-symbol="ETHUSDT">ETH/USDT <small>Ethereum</small></button>
+          <button data-symbol="BNBUSDT">BNB/USDT <small>BNB</small></button>
+          <button data-symbol="XRPUSDT">XRP/USDT <small>XRP</small></button>
+          <button data-symbol="TRXUSDT">TRX/USDT <small>TRON</small></button>
+          <button data-symbol="DOGEUSDT">DOGE/USDT <small>Dogecoin</small></button>
+        </div>
+      </div>
+
+      <nav class="main-nav">
+        <a href="/">现货</a>
+        <a href="/futures" class="active">合约</a>
+        <a href="/grid">现货网格</a>
+        <a href="/research">事件 × ML</a>
+        <a href="/models">模型工坊</a>
+      </nav>
+      <div class="ticker">
+        <span id="fPair" class="pair">BTC<span>/USDT</span></span>
+        <strong id="fPrice">--</strong>
+        <span class="subpage-badge">PAPER PERP</span>
+      </div>
+      <div class="top-actions">
+        <span class="mini-badge amber">1–100X</span>
+        <span class="mini-badge neutral">LONG / SHORT</span>
+        <button id="fRefresh" class="icon-btn" title="刷新">↻</button>
+        <button id="multiBtn" class="icon-btn" title="多图窗口（最多 4 个）">▦</button>
+        <div class="ui-menu"></div>
+      </div>
+    </header>
+
+    <div id="fAlert" class="alert hidden"></div>
+
+    <main class="subpage-grid">
+      <aside class="market-rail">
+        <div class="rail-head"><span>市场观察</span><span class="rail-live"><i></i> LIVE</span></div>
+        <div class="watchlist" id="watchlist"><div class="rail-empty">加载行情…</div></div>
+        <div class="rail-tabs" id="railTabs">
+          <button data-tab="flow" class="active">资金流</button>
+          <button data-tab="lev">杠杆</button>
+          <button data-tab="ls">多空</button>
+        </div>
+        <div class="rail-panel" id="railPanel"><div class="rail-empty">加载中…</div></div>
+      </aside>
+
+      <section class="panel chart-panel">
+        <div class="panel-head chart-head">
+          <div>
+            <div class="eyebrow">MARKET / SIMULATED PERP</div>
+            <h2><span id="fChartSymbol">BTCUSDT</span> <span class="muted">· 以现货标记价模拟</span></h2>
+          </div>
+          <div class="chart-tools">
+            <div class="seg compact" id="fIntervalSeg">
+              <button data-interval="30s" title="真实 1 秒数据聚合">30S</button><button data-interval="1m">1M</button><button data-interval="3m">3M</button>
+              <button data-interval="5m">5M</button>
+              <button data-interval="15m">15M</button>
+              <button data-interval="30m">30M</button>
+              <button data-interval="1h" class="active">1H</button>
+              <button data-interval="4h">4H</button>
+              <button data-interval="1d">1D</button>
+            </div>
+            <select id="historyLimit" class="history-select" title="显示多少根历史 K 线">
+              <option value="300">300 根</option>
+              <option value="800" selected>800 根</option>
+              <option value="1500">1500 根</option>
+              <option value="3000">3000 根</option>
+            </select>
+            <span class="live-pill"><i></i> PAPER</span>
+          </div>
+        </div>
+        <div class="ohlc-row">
+          <span>O <b id="fO">--</b></span>
+          <span>H <b id="fH">--</b></span>
+          <span>L <b id="fL">--</b></span>
+          <span>C <b id="fC">--</b></span>
+          <span class="spacer"></span>
+          <span class="ema-key" id="legend-ema20"><i class="e20"></i>EMA20</span>
+          <span class="ema-key" id="legend-ema100"><i class="e100"></i>EMA100</span>
+          <span class="ema-key" id="legend-ema200"><i class="e200"></i>EMA200</span>
+          <span class="ema-key" id="legend-ma5"><i class="ma5"></i>MA5</span>
+          <span class="ema-key" id="legend-ma10"><i class="ma10"></i>MA10</span>
+          <span class="ema-key" id="legend-ma20"><i class="ma20"></i>MA20</span>
+          <span class="ema-key" id="legend-ma60"><i class="ma60"></i>MA60</span>
+        </div>
+        <div class="draw-bar">
+          <span class="draw-label">划线</span>
+          <button class="tool-btn tool-text active" data-tool="select" title="选择 / 缩放">选择</button>
+          <button class="tool-btn tool-text" data-tool="trend" title="趋势线">趋势线</button>
+          <button class="tool-btn tool-text" data-tool="hline" title="水平线">水平线</button>
+          <button class="tool-btn tool-text" data-tool="pen" title="自由涂鸦">涂鸦</button>
+          <button class="tool-btn tool-text" data-tool="erase" title="橡皮擦">橡皮</button>
+          <span class="draw-sep"></span>
+          <button id="fUndoDraw" class="tool-btn tool-text" title="撤销">撤销</button>
+          <button id="fClearDraw" class="tool-btn tool-text" title="清空">清空</button>
+          <span id="fDrawTip" class="draw-tip">选择工具后在图上拖动</span>
+          <div class="ma-menu">
+            <button id="fMaBtn" class="tool-btn ma-btn" title="显示/隐藏均线">均线 <span>▾</span></button>
+            <div id="fMaPanel" class="ma-panel hidden">
+              <label><input type="checkbox" data-fma="ema20" checked><i class="sw e20"></i>EMA20</label>
+              <label><input type="checkbox" data-fma="ema100" checked><i class="sw e100"></i>EMA100</label>
+              <label><input type="checkbox" data-fma="ema200" checked><i class="sw e200"></i>EMA200</label>
+              <label><input type="checkbox" data-fma="ma5"><i class="sw ma5"></i>MA5</label>
+              <label><input type="checkbox" data-fma="ma10"><i class="sw ma10"></i>MA10</label>
+              <label><input type="checkbox" data-fma="ma20" checked><i class="sw ma20"></i>MA20</label>
+              <label><input type="checkbox" data-fma="ma60"><i class="sw ma60"></i>MA60</label>
+            </div>
+          </div>
+        </div>
+        <div id="fChartWrap" class="chart-wrap">
+          <div id="fChart" class="chart"></div>
+          <canvas id="fDrawCanvas" class="draw-canvas"></canvas>
+        </div>
+        <div class="chart-foot">
+          <span id="fChartStatus">等待行情…</span>
+          <span id="fLastUpdate">—</span>
+        </div>
+      </section>
+
+      <section class="panel futures-book">
+        <div class="panel-head compact">
+          <div><div class="eyebrow">POSITIONS / ORDERS</div><h2>持仓与委托</h2></div>
+          <div class="seg compact" id="fBookTabs">
+            <button data-book="pos" class="active">持仓</button>
+            <button data-book="orders">委托</button>
+            <button data-book="fills">成交</button>
+          </div>
+        </div>
+        <div id="fBookBody" class="book-body">
+          <div class="empty-state">暂无持仓</div>
+        </div>
+      </section>
+
+      <aside class="sidebar">
+        <section class="panel account-card account-with-assets">
+          <div class="account-scroll">
+            <div class="panel-head compact">
+              <div><div class="eyebrow">MARGIN ACCOUNT</div><h2>合约权益</h2></div>
+              <span id="fMarginBadge" class="mini-badge amber">ISOLATED</span>
+            </div>
+            <div class="equity"><span id="fEquity">--</span> <small>USDT</small></div>
+            <div class="pnl-line"><span>本次会话盈亏</span><strong id="fSessionPnl">--</strong></div>
+            <div class="metric-grid">
+              <div><span>钱包余额</span><b id="fWallet">--</b></div>
+              <div><span>可用保证金</span><b id="fAvailable">--</b></div>
+              <div><span>未实现盈亏</span><b id="fUnrealized">--</b></div>
+              <div><span>已实现盈亏</span><b id="fRealized">--</b></div>
+            </div>
+            <section class="portfolio-card" id="portfolioCard" data-market="futures" aria-labelledby="portfolioHeading">
+              <div class="portfolio-head">
+                <h3 id="portfolioHeading">合约保证金分布</h3>
+                <span class="mini-badge neutral">USDT</span>
+              </div>
+              <div class="portfolio-main">
+                <div id="portfolioPie" class="portfolio-pie" role="img" aria-label="可用和已占用保证金的比例"></div>
+                <div id="portfolioLegend" class="portfolio-legend"><div class="hint">正在读取合约保证金…</div></div>
+              </div>
+            </section>
+          </div>
+        </section>
+
+        <section class="panel position-card">
+          <div class="panel-head compact">
+            <div><div class="eyebrow">POSITION</div><h2 id="fPosSide">FLAT</h2></div>
+            <span id="fPosBadge" class="mini-badge neutral">0 BTC</span>
+          </div>
+          <div class="kv-grid">
+            <div><span>数量</span><b id="fPosQty">—</b></div>
+            <div><span>开仓价</span><b id="fPosEntry">—</b></div>
+            <div><span>标记价</span><b id="fPosMark">—</b></div>
+            <div><span>杠杆</span><b id="fPosLev">—</b></div>
+            <div><span>强平价</span><b id="fPosLiq">—</b></div>
+            <div><span>保证金</span><b id="fPosMargin">—</b></div>
+            <div><span>未实现盈亏</span><b id="fPosPnl">—</b></div>
+            <div><span>ROE</span><b id="fPosRoe">—</b></div>
+            <div><span>止盈价</span><b id="fPosTp">—</b></div>
+            <div><span>止损价</span><b id="fPosSl">—</b></div>
+            <div><span>保证金模式</span><b id="fPosMode">—</b></div>
+          </div>
+          <div class="form-field" style="padding:6px 15px 4px">
+            <label>限价平仓 / 止盈价（可选）</label>
+            <input id="fCloseLimit" type="number" min="0.01" step="1" placeholder="例如 82000">
+          </div>
+          <div class="form-actions" style="padding-top:4px">
+            <button id="fCloseLimitBtn" class="secondary" disabled>挂限价平仓</button>
+            <button id="fCloseBtn" class="secondary" disabled>市价平仓</button>
+          </div>
+          <div class="form-actions" style="padding-top:0">
+            <button id="fResetBtn" class="secondary">重置账户</button>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head compact">
+            <div><div class="eyebrow">QUANT MODEL</div><h2>合约量化</h2></div>
+            <label class="switch" title="按所选模型自动开多、开空及平仓；手动仓位不接管">
+              <input id="fAutoToggle" type="checkbox">
+              <span class="slider"></span>
+              <span class="switch-label">AUTO</span>
+            </label>
+          </div>
+          <div class="form-grid">
+            <div class="form-field">
+              <label>模型周期</label>
+              <select id="fAutoInterval"><option value="1m">1 分钟</option><option value="5m">5 分钟</option><option value="15m">15 分钟</option><option value="30m" selected>30 分钟</option><option value="1h">1 小时</option><option value="2h">2 小时</option><option value="4h">4 小时</option><option value="8h">8 小时</option><option value="12h">12 小时</option><option value="1d">1 天</option></select>
+            </div>
+            <div class="form-field">
+              <label>自动杠杆</label>
+              <input id="fAutoLeverage" type="number" min="1" max="100" step="1" value="5">
+            </div>
+          </div>
+          <p class="hint" id="fAutoHint" style="margin-top:0">按所选模型模拟开多、开空、退出；自动仓位带 ATR 止损和可配置移动保护。</p>
+        </section>
+
+
+        <section class="panel order-card">
+          <div class="panel-head compact">
+            <div><div class="eyebrow">ORDER TICKET</div><h2>开仓 / 计划单</h2></div>
+            <span class="mini-badge neutral">PAPER</span>
+          </div>
+          <div class="side-toggle" id="fSideToggle">
+            <button class="long active" data-side="LONG">做多 LONG</button>
+            <button class="short" data-side="SHORT">做空 SHORT</button>
+          </div>
+          <div class="form-grid">
+            <div class="form-field">
+              <label>订单类型</label>
+              <select id="fOrderType"><option value="MARKET">市价 MARKET</option><option value="LIMIT">限价 LIMIT</option></select>
+            </div>
+            <div class="form-field">
+              <label>名义价值（USDT）</label>
+              <input id="fNotional" type="number" min="5" step="100" value="1000">
+            </div>
+            <div class="form-field full" style="margin-top:-2px">
+              <span id="fQtyHint" class="hint" style="margin:0">按当前标记价折算 BTC 数量</span>
+            </div>
+            <div class="form-field full" id="fLimitWrap" style="display:none">
+              <label>限价（USDT）</label>
+              <input id="fLimit" type="number" min="0.01" step="1" placeholder="例如 80000">
+            </div>
+            <div class="form-field full">
+              <label>保证金模式</label>
+              <div class="margin-toggle" id="fMarginToggle">
+                <button type="button" data-margin="ISOLATED" class="active">逐仓</button>
+                <button type="button" data-margin="CROSS">全仓</button>
+              </div>
+            </div>
+            <div class="form-field full">
+              <label>杠杆 <span class="muted">1–100x</span></label>
+              <div class="leverage-row">
+                <input id="fLeverageRange" type="range" min="1" max="100" step="1" value="10">
+                <span class="leverage-badge" id="fLeverageLabel">10x</span>
+              </div>
+            </div>
+            <div class="form-field"><label>止盈价（可选）</label><input id="fTp" type="number" min="0.01" step="1" placeholder="高于/低于开仓"></div>
+            <div class="form-field"><label>止损价（可选）</label><input id="fSl" type="number" min="0.01" step="1" placeholder="反向触发"></div>
+          </div>
+          <div class="form-actions">
+            <button id="fSubmitBtn" class="primary">提交模拟单</button>
+          </div>
+          <p class="hint" style="margin-top:0">市价单按现货标记价 + 2 bps 滑点成交；限价单在价格触及时成交。手续费 0.05%。</p>
+
+          <details class="calculator" id="fCalc" open>
+            <summary>利润计算器 <span>点击展开 / 收起</span></summary>
+            <div class="form-grid" style="padding:0 0 6px">
+              <div class="form-field"><label>入场价</label><input id="calcEntry" type="number" step="1" value="80000"></div>
+              <div class="form-field"><label>出场价</label><input id="calcExit" type="number" step="1" value="82000"></div>
+              <div class="form-field"><label>名义价值 USDT</label><input id="calcNotionalInput" type="number" step="100" value="1000"></div>
+              <div class="form-field"><label>杠杆</label><input id="calcLev" type="number" min="1" max="100" step="1" value="10"></div>
+            </div>
+            <div class="calc-result">
+              <div><span>方向</span><b id="calcSide">LONG</b></div>
+              <div><span>数量 <span id="fCalcQtyLabel">BTC</span></span><b id="calcQtyOut">--</b></div>
+              <div><span>保证金</span><b id="calcMargin">--</b></div>
+              <div><span>盈亏</span><b id="calcPnl">--</b></div>
+              <div><span>ROE</span><b id="calcRoe">--</b></div>
+              <div><span>强平价</span><b id="calcLiq">--</b></div>
+            </div>
+          </details>
+        </section>
+      </aside>
+
+      <section class="bottom-grid">
+        <section class="panel orders-panel">
+          <div class="panel-head compact">
+            <div><div class="eyebrow">ACTIVITY</div><h2>订单 / 成交</h2></div>
+            <span id="fOrderCount" class="mini-badge neutral">0</span>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>时间</th><th>动作</th><th>方向</th><th>价格</th><th>数量</th><th>杠杆</th><th>盈亏</th></tr></thead>
+              <tbody id="fOrdersBody"><tr class="empty-row"><td colspan="7">暂无订单</td></tr></tbody>
+            </table>
+          </div>
+          <div id="fPending" class="empty-state">没有挂单</div>
+        </section>
+        <section class="panel events-panel">
+          <div class="panel-head compact"><div><div class="eyebrow">SYSTEM</div><h2>事件</h2></div><span class="mini-badge neutral">PAPER</span></div>
+          <div id="fEvents" class="events-list"></div>
+        </section>
+      </section>
+    </main>
+
+    <footer class="footer"><span><b>SIMULATED PERP</b> · 不连接 Binance Futures · 仅本地模拟</span><span id="fSource">spot mark · 2s poll</span></footer>
+  </div>
+  <div id="fToast" class="toast"></div>
+  <div id="fLoading" class="loading">CONNECTING<span>.</span><span>.</span><span>.</span></div>
+  <script src="/static/vendor/lightweight-charts.standalone.production.js?v=tv2"></script>
+  <script src="/static/live-chart-resize.js?v=20261107"></script>
+  <script src="/static/live-ticket.js?v=20261107"></script>
+  <script src="/static/capabilities.js?v=20261107-cap"></script>
+  <script src="/static/ui.js?v=20261107-live-ui"></script>
+  <script src="/static/symbols.js?v=tv2"></script>
+  <script src="/static/market.js?v=account-mode"></script>
+  <script src="/static/drawing-coordinates.js?v=tv2"></script>
+  <script src="/static/volume-pane.js?v=plan3"></script>
+  <script src="/static/futures.js?v=account-mode"></script>
+  <script src="/static/workspace.js?v=account-mode"></script>
+  <script src="/static/quant-guide.js?v=account-mode"></script>
+  <script src="/static/terminal.js?v=account-mode"></script>
+  <script src="/static/portfolio.js?v=account-mode"></script>
+  <script src="/static/layout.js?v=20261107-resize"></script>
+<script src="/static/help-tips.js?v=plan3"></script></body>
+</html>

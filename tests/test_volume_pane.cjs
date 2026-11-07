@@ -1,0 +1,10 @@
+const assert=require('node:assert/strict');
+const {prepare}=require('../btcquant/static/volume-pane.js');
+const data=Array.from({length:12},(_,i)=>({time:i+1,open:10,close:i%2?9:11,volume:i+1}));
+const p=prepare(data);
+assert.equal(p.rows.length,12);assert.equal(p.rows[0].value,1);assert.notEqual(p.rows[0].color,p.rows[1].color);
+assert.equal(p.ma5[3].value,undefined);assert.equal(p.ma5[4].value,3);assert.equal(p.ma5[11].value,10);
+assert.equal(p.ma10[8].value,undefined);assert.equal(p.ma10[9].value,5.5);assert.equal(p.ma10[11].value,7.5);
+assert.deepEqual(prepare([]),{rows:[],ma5:[],ma10:[]});
+assert.throws(()=>prepare([{time:1,volume:-2}]),/无效/);
+console.log('Volume bar direction, MA warmup and rolling averages passed.');

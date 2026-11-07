@@ -1,0 +1,9 @@
+pandas>=2.2
+numpy>=1.26
+matplotlib>=3.8
+requests>=2.31
+pytest>=8.0
+httpx>=0.28
+fastapi>=0.115
+uvicorn>=0.30
+hyperliquid-python-sdk==0.24.0

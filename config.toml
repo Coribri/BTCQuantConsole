@@ -1,0 +1,72 @@
+# BTC spot long-only paper-trading lab
+# All relative paths are resolved against this file's directory.
+report_dir = "reports"
+
+[market]
+symbol = "BTCUSDT"
+interval = "4h"
+start = "2017-08-17"
+quote = "USDT"
+
+[data]
+dir = "data"
+base_urls = [
+  "https://data-api.binance.vision",
+  "https://api.binance.com",
+  "https://api1.binance.com",
+  "https://api2.binance.com",
+]
+timeout_seconds = 20
+
+[backtest]
+initial_cash = 10000.0
+fee_rate = 0.001          # Binance spot taker fee, 10 bps
+slippage_bps = 2.0        # 2 bps per side
+max_fraction = 0.95       # never use more than 95% of equity
+sizing = "risk"           # fixed_fraction | risk
+risk_per_trade = 0.02     # risk 2% of equity to the initial stop
+bars_per_year = 2190      # 4h bars: 6 * 365
+train_end = "2022-12-31"
+test_start = "2023-01-01"
+
+[strategy]
+name = "trend"            # trend | donchian | meanrev
+
+[strategy.params]
+fast = 20
+slow = 100
+regime = 200
+adx_min = 20.0
+atr_stop = 3.0
+trail_atr = 0.0
+max_hold = 0
+
+[paper]
+initial_cash = 10000.0
+fee_rate = 0.001
+slippage_bps = 2.0
+max_fraction = 0.95
+sizing = "risk"
+risk_per_trade = 0.02
+poll_seconds = 60
+state_file = "runtime/paper_state.json"
+trades_file = "runtime/paper_trades.csv"
+equity_file = "runtime/paper_equity.csv"
+log_file = "runtime/paper_events.jsonl"
+
+[testnet]
+base_url = "https://testnet.binance.vision"
+api_key_env = "BINANCE_TESTNET_API_KEY"
+api_secret_env = "BINANCE_TESTNET_API_SECRET"
+recv_window = 5000
+poll_seconds = 5
+auto_start = false
+quote_amount = 100.0
+state_file = "runtime/testnet_state.json"
+paper_state_file = "runtime/dashboard_paper_state.json"
+
+[web]
+host = "127.0.0.1"
+port = 18787
+open_browser = true
+

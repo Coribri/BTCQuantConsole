@@ -1,0 +1,65 @@
+/* Readable trading workspace. Loaded last so page-specific rules stay intact. */
+:root { --muted: #a1adbd; --muted-2: #8492a3; --radius: 10px; }
+.app { width: 100%; max-width: 1900px; padding: 16px 22px 22px; gap: 16px; }
+.topbar, .subpage .topbar { gap: 16px; flex-wrap: wrap; }
+.brand { min-width: 185px; gap: 10px; }.brand h1 { font-size: calc(16px * var(--font-scale)); }.brand p { font-size: 8px; letter-spacing: .13em; }.brand .mark { width: 34px; height: 34px; border-radius: 8px; box-shadow: none; }
+.main-nav a { font-size: calc(12px * var(--font-scale)); padding: 8px 12px; }
+.ticker { min-width: 220px; gap: 8px; }.ticker strong { font-size: calc(24px * var(--font-scale)); }.ticker .pair { font-size: 11px; }
+.top-actions { gap: 8px; }.symbol-btn { font-size: 12px; min-height: 34px; }.icon-btn { min-width: 32px; min-height: 32px; }
+.panel { background: var(--panel); box-shadow: none; }.panel-head.compact { padding: 15px 16px 10px; }.panel-head h2 { font-size: calc(15px * var(--font-scale)); }.eyebrow { font-size: 9px; letter-spacing: .12em; }
+.badge, .mini-badge, .subpage-badge { font-size: calc(10px * var(--font-scale)); letter-spacing: .04em; }
+.seg button, .seg.compact button, .model-seg button, .history-select, .tool-btn { font-size: calc(11px * var(--font-scale)); min-height: 29px; }
+.draw-bar { gap: 5px; flex-wrap: wrap; }.draw-tip { display: none; }.chart-head { flex-wrap: wrap; gap: 9px; }.chart-tools { gap: 7px; flex-wrap: wrap; }
+.ohlc-row { font-size: 11px; gap: 11px; }.chart-foot { font-size: 10px; line-height: 1.8; }
+.field-label, .form-field label { color: var(--muted); font-size: calc(12px * var(--font-scale)); }
+.form-field input, .form-field select, .stop-editor input, .amount-wrap input { font-size: calc(13px * var(--font-scale)); min-height: 35px; }
+.form-actions .primary, .form-actions .secondary, .buy-btn, .sell-btn, .ghost-btn { font-size: calc(12px * var(--font-scale)); min-height: 36px; }
+.side-toggle button, .margin-toggle button { font-size: calc(12px * var(--font-scale)); min-height: 34px; }.quick-amounts button { font-size: 11px; min-height: 28px; }
+.hint { color: var(--muted); font-size: calc(11px * var(--font-scale)); line-height: 1.8; }.metric-grid span, .balance-grid span, .kv-grid span, .meter-row span { font-size: calc(11px * var(--font-scale)); }
+.metric-grid b, .balance-grid b, .kv-grid b, .meter-row b { font-size: calc(12px * var(--font-scale)); }.equity { font-size: calc(28px * var(--font-scale)); margin-top: 2px; }.pnl-line { font-size: 11px; }
+.account-card .panel-head { padding-bottom: 5px; }.account-card .equity { padding-top: 0; margin-bottom: 4px; }.account-card .pnl-line { padding-bottom: 10px; }.account-card .balance-grid, .account-card .metric-grid { gap: 8px; padding: 10px 15px; background: transparent; }.account-card .metric-grid > div { padding: 0; }.account-card .balance-grid b, .account-card .metric-grid b { margin-top: 2px; }
+.sidebar { min-width: 0; gap: 14px; }.sidebar .order-card { border-top: 2px solid var(--green); }.sidebar .strategy-card { border-top: 2px solid #a597ff; }
+.position-card .kv-grid { gap: 9px; }.calculator summary { font-size: 12px; }
+.market-rail { position: static; }.rail-head { font-size: 12px; }.coin-base, .coin-price { font-size: 11px; }.coin-chg { font-size: 10px; }.coin-meta { font-size: 9px; }.rail-tabs button, .rail-kv span, .rail-kv b { font-size: 11px; }
+.workspace-strip { display: flex; align-items: center; justify-content: space-between; gap: 15px; padding: 10px 14px; border: 1px solid var(--line); background: var(--panel); border-radius: 7px; font-size: 11px; color: var(--muted); flex-wrap: wrap; }.workspace-strip strong { color: var(--text); font-weight: 500; }.workspace-strip a { color: #b2a5ff; text-decoration: none; }.workspace-strip a:hover { text-decoration: underline; }.workspace-strip .context-label { color: var(--green); font: 10px var(--mono); margin-right: 10px; }
+.workspace-risk, .grid-preview { margin: 2px 15px 13px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg-soft); font-size: 11px; color: var(--muted); line-height: 1.9; }.workspace-risk div, .grid-preview div { display: flex; justify-content: space-between; gap: 12px; }.workspace-risk b, .grid-preview b { color: var(--text); font-family: var(--mono); font-weight: 500; }.workspace-risk .risk-warning { color: var(--amber); }
+.workspace-market-btn { border: 1px solid var(--line); background: transparent; color: var(--muted); padding: 4px 9px; border-radius: 4px; cursor: pointer; font-size: 11px; min-height: 26px; }
+.workspace-mobile-market { display: none; }
+.futures-book { min-width: 0; grid-row: 2; }.book-body { overflow: auto; }th { font-size: 11px; }td { font-size: 12px; }.table-wrap { overflow: auto; }.event-item { font-size: 11px; }
+.layout .main-column, .subpage-grid .main-column { min-width:0;display:flex;flex-direction:column;gap:16px;grid-row:1 / span 3; }
+.layout .main-column .chart-wrap,.subpage-grid .main-column .chart-wrap{height:clamp(390px,58vh,650px);}
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible { outline: 2px solid #a597ff; outline-offset: 3px; }
+@media(min-width:1500px){
+  .layout, .subpage-grid { grid-template-columns: 215px minmax(0,1fr) 350px; gap: 16px; }
+  .layout .market-rail,.subpage-grid .market-rail{display:block;grid-column:1;grid-row:1 / span 3;}
+  .layout .chart-panel,.subpage-grid .chart-panel { grid-column: 2; grid-row: 1; }
+  .layout .sidebar,.subpage-grid .sidebar { grid-column:3;grid-row:1 / span 3; }
+  .layout .bottom-grid,.subpage-grid .bottom-grid { grid-column:2;grid-row:3;grid-template-columns:1fr; }
+  .futures-book {grid-column:2;grid-row:2;}
+  .layout .main-column,.subpage-grid .main-column{grid-column:2;}
+}
+@media(min-width:1001px) and (max-width:1499px){
+  .layout,.subpage-grid{grid-template-columns:minmax(0,1fr) 330px;gap:16px;}
+  .layout .chart-panel,.subpage-grid .chart-panel{grid-column:1;grid-row:1;}
+  .layout .sidebar,.subpage-grid .sidebar{grid-column:2;grid-row:1 / span 3;}
+  .layout .bottom-grid,.subpage-grid .bottom-grid{grid-column:1;grid-row:3;grid-template-columns:1fr;}
+  .market-rail{display:none;}.workspace-mobile-market{display:inline-flex;}
+  .market-rail.workspace-market-open{display:block;grid-column:1 / -1!important;grid-row:4!important;}.futures-book{grid-column:1;grid-row:2;}
+  .layout .main-column,.subpage-grid .main-column{grid-column:1;}
+}
+@media(min-width:1001px){.chart-wrap,.subpage .chart-wrap{height:clamp(390px,58vh,650px);min-height:300px;}.bottom-grid{align-self:start;}}
+@media(max-width:1000px){
+  .app{padding:12px 14px;}.layout,.subpage-grid{grid-template-columns:1fr;gap:14px;}
+  .layout .chart-panel,.subpage-grid .chart-panel,.layout .sidebar,.subpage-grid .sidebar,.layout .bottom-grid,.subpage-grid .bottom-grid,.futures-book{grid-column:1;grid-row:auto;}
+  .layout .sidebar,.subpage-grid .sidebar{display:grid;grid-template-columns:1fr 1fr;}.sidebar .order-card{grid-column:1;}.market-rail{display:none;}.workspace-mobile-market{display:inline-flex;}.market-rail.workspace-market-open{display:block;grid-column:1!important;grid-row:auto!important;}
+  .ticker{margin-left:auto;}.top-actions{margin-left:0;}.brand{min-width:155px;}.chart-wrap,.subpage .chart-wrap{height:420px;}.bottom-grid{grid-template-columns:1fr;}
+  .layout .main-column,.subpage-grid .main-column{grid-column:1;grid-row:auto;}.layout .main-column .chart-wrap,.subpage-grid .main-column .chart-wrap{height:420px;}
+}
+@media(max-width:640px){
+  .layout .sidebar,.subpage-grid .sidebar{grid-template-columns:1fr;}.main-nav{max-width:100%;overflow:auto;}.main-nav a{font-size:11px;padding:7px 10px;}.topbar{gap:10px;}.ticker{min-width:0;width:100%;flex-wrap:wrap;margin-left:0;}.ticker strong{font-size:21px;}.ticker .pair{display:none;}.top-actions{width:100%;justify-content:flex-end;}.chart-wrap,.subpage .chart-wrap{height:340px;}.chart-tools{width:100%;}.seg button{padding:5px 6px;}.ohlc-row .ema-key{display:none;}.workspace-strip{font-size:10px;}.brand p{display:none;}.workspace-risk{font-size:11px;}
+  .layout .main-column .chart-wrap,.subpage-grid .main-column .chart-wrap{height:340px;}
+  .ticker{flex:0 0 100%;}.main-nav{flex:0 0 100%;width:100%;}.top-actions{flex:0 0 100%;}
+}
+html.chart-window .workspace-strip,html.pane-mode .workspace-strip{display:none;}
+html.chart-window .layout .main-column,html.chart-window .subpage-grid .main-column{grid-column:1;grid-row:auto;}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important;}}

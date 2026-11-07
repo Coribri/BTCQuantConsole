@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="/static/favicon.ico">
+  <script>
+  const accountParams = new URLSearchParams(location.search);
+  if (accountParams.get("account") === "live" && accountParams.get("pane") !== "1" && accountParams.get("window") !== "1") {
+    document.documentElement.dataset.accountMode = "live";
+  }
+  (() => { try {
+    const t = localStorage.getItem('btcquant.theme');
+    if (t === 'light') document.documentElement.dataset.theme = 'light';
+    const f = Number(localStorage.getItem('btcquant.fontScale'));
+    if (f >= 0.9 && f <= 1.3) document.documentElement.style.setProperty('--font-scale', String(f));
+  } catch (_) {} })();
+  </script>
+  <title>BTC Quant · 现货网格</title>
+  <link rel="stylesheet" href="/static/styles.css?v=v21ui">
+  <link rel="stylesheet" href="/static/pages.css?v=tv2">
+  <link rel="stylesheet" href="/static/theme.css?v=20261107-live-ui">
+  <link rel="stylesheet" href="/static/workspace.css?v=tv2">
+  <link rel="stylesheet" href="/static/terminal.css?v=v21ui">
+  <link rel="stylesheet" href="/static/layout.css?v=v21ui">
+<link rel="stylesheet" href="/static/help-tips.css?v=plan3">
+<link rel="stylesheet" href="/static/volume-pane.css?v=plan3">
+</head>
+<body class="subpage grid-console">
+  <div class="ambient"></div>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="mark"><img src="/static/logo.png" alt="BTC Quant"></div>
+        <div><h1>BTC QUANT</h1><p>SPOT GRID SIMULATOR</p></div>
+      </div>
+      <div class="symbol-picker">
+        <button id="symbolBtn" class="symbol-btn" title="切换交易对"><span id="symbolLabel">BTC/USDT</span><span class="caret">▾</span></button>
+        <div id="symbolMenu" class="symbol-menu hidden">
+          <button data-symbol="BTCUSDT">BTC/USDT <small>Bitcoin</small></button>
+          <button data-symbol="ETHUSDT">ETH/USDT <small>Ethereum</small></button>
+          <button data-symbol="BNBUSDT">BNB/USDT <small>BNB</small></button>
+          <button data-symbol="XRPUSDT">XRP/USDT <small>XRP</small></button>
+          <button data-symbol="TRXUSDT">TRX/USDT <small>TRON</small></button>
+          <button data-symbol="DOGEUSDT">DOGE/USDT <small>Dogecoin</small></button>
+        </div>
+      </div>
+
+      <nav class="main-nav">
+        <a href="/">现货</a>
+        <a href="/futures">合约</a>
+        <a href="/grid" class="active">现货网格</a>
+        <a href="/research">事件 × ML</a>
+        <a href="/models">模型工坊</a>
+      </nav>
+      <div class="ticker">
+        <span id="gPair" class="pair">BTC<span>/USDT</span></span>
+        <strong id="gPrice">--</strong>
+        <span class="subpage-badge">GRID PAPER</span>
+      </div>
+      <div class="top-actions">
+        <span id="gRunBadge" class="mini-badge neutral">STOPPED</span>
+        <button id="gRefresh" class="icon-btn" title="刷新">↻</button>
+        <button id="multiBtn" class="icon-btn" title="多图窗口（最多 4 个）">▦</button>
+        <div class="ui-menu"></div>
+      </div>
+    </header>
+
+    <div id="gAlert" class="alert hidden"></div>
+
+    <main class="subpage-grid">
+      <aside class="market-rail">
+        <div class="rail-head"><span>市场观察</span><span class="rail-live"><i></i> LIVE</span></div>
+        <div class="watchlist" id="watchlist"><div class="rail-empty">加载行情…</div></div>
+        <div class="rail-tabs" id="railTabs">
+          <button data-tab="flow" class="active">资金流</button>
+          <button data-tab="lev">杠杆</button>
+          <button data-tab="ls">多空</button>
+        </div>
+        <div class="rail-panel" id="railPanel"><div class="rail-empty">加载中…</div></div>
+      </aside>
+
+      <section class="panel chart-panel">
+        <div class="panel-head chart-head">
+          <div>
+            <div class="eyebrow">MARKET / SPOT GRID</div>
+            <h2><span id="gChartSymbol">BTCUSDT</span> <span class="muted">· 本地网格模拟</span></h2>
+          </div>
+          <div class="chart-tools">
+            <div class="seg compact" id="gIntervalSeg">
+              <button data-interval="30s" title="真实 1 秒数据聚合">30S</button><button data-interval="1m">1M</button><button data-interval="3m">3M</button>
+              <button data-interval="5m">5M</button>
+              <button data-interval="15m">15M</button>
+              <button data-interval="1h" class="active">1H</button>
+              <button data-interval="4h">4H</button>
+              <button data-interval="1d">1D</button>
+            </div>
+            <select id="historyLimit" class="history-select" title="显示多少根历史 K 线">
+              <option value="300">300 根</option>
+              <option value="800" selected>800 根</option>
+              <option value="1500">1500 根</option>
+              <option value="3000">3000 根</option>
+            </select>
+            <span class="live-pill"><i></i> PAPER</span>
+          </div>
+        </div>
+        <div class="ohlc-row">
+          <span>O <b id="gO">--</b></span>
+          <span>H <b id="gH">--</b></span>
+          <span>L <b id="gL">--</b></span>
+          <span>C <b id="gC">--</b></span>
+          <span class="spacer"></span>
+          <span class="muted" style="font-size:9px">网格线为本地模拟价位，不会真实挂单</span>
+        </div>
+        <div id="gChartWrap" class="chart-wrap"><div id="gChart" class="chart"></div></div>
+        <div class="chart-foot">
+          <span id="gChartStatus">等待行情…</span>
+          <span id="gNextBar">下一根 1H: —</span>
+          <span id="gLastUpdate">—</span>
+        </div>
+      </section>
+
+      <aside class="sidebar">
+        <section class="panel account-card">
+          <div class="panel-head compact">
+            <div><div class="eyebrow">GRID ACCOUNT</div><h2>网格权益</h2></div>
+            <span id="gStatusBadge" class="mini-badge neutral">STOPPED</span>
+          </div>
+          <div class="equity"><span id="gEquity">--</span> <small>USDT</small></div>
+          <div class="pnl-line"><span>Session PnL</span><strong id="gSessionPnl">--</strong></div>
+          <div class="grid-summary">
+            <div><span>自由现金</span><b id="gCash">--</b></div>
+            <div><span>网格现金</span><b id="gGridCash">--</b></div>
+            <div><span><span id="gBaseLabel">BTC</span> 库存</span><b id="gInventory">--</b></div>
+            <div><span>库存均价</span><b id="gAvgCost">--</b></div>
+            <div><span>已实现盈亏</span><b id="gRealized">--</b></div>
+            <div><span>未实现盈亏</span><b id="gUnrealized">--</b></div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head compact">
+            <div><div class="eyebrow">GRID CONFIG</div><h2>区间与参数</h2></div>
+            <span class="mini-badge neutral">LONG ONLY</span>
+          </div>
+          <div class="form-grid">
+            <div class="form-field"><label>下边界 USDT</label><input id="gLower" type="number" min="1" step="100" value="74000"></div>
+            <div class="form-field"><label>上边界 USDT</label><input id="gUpper" type="number" min="1" step="100" value="86000"></div>
+            <div class="form-field"><label>网格数量</label><input id="gGrids" type="number" min="2" max="100" step="1" value="20"></div>
+            <div class="form-field"><label>投入 USDT</label><input id="gInvestment" type="number" min="10" step="100" value="3000"></div>
+            <div class="form-field"><label>分布</label><select id="gMode"><option value="arithmetic">等差</option><option value="geometric">等比</option></select></div>
+            <div class="form-field"><label>初始仓位（%）</label><input id="gInitial" type="number" min="0" max="100" step="5" value="50"></div>
+            <div class="form-field full"><label>低于下边界多少止损（%）</label><input id="gStop" type="number" min="0" max="50" step="0.5" value="8"></div>
+          </div>
+          <div class="form-actions">
+            <button id="gStartBtn" class="primary">启动网格</button>
+            <button id="gStopBtn" class="secondary" disabled>停止</button>
+          </div>
+          <div class="form-actions" style="padding-top:0">
+            <button id="gResetBtn" class="secondary">重置模拟账户</button>
+          </div>
+          <p class="hint" style="margin-top:0">只做多现货网格：下跌逐格买入，上涨一格卖出。到期/触顶会平掉库存并停止；触底止损也会清仓。</p>
+        </section>
+      </aside>
+
+      <section class="bottom-grid">
+        <section class="panel orders-panel">
+          <div class="panel-head compact">
+            <div><div class="eyebrow">GRID LEVELS</div><h2>网格线</h2></div>
+            <span id="gLevelCount" class="mini-badge neutral">0</span>
+          </div>
+          <div id="gLevels" class="grid-levels"><div class="empty-state">尚未启动</div></div>
+        </section>
+        <section class="panel events-panel">
+          <div class="panel-head compact"><div><div class="eyebrow">FILLS / EVENTS</div><h2>成交与事件</h2></div><span class="mini-badge neutral">LIVE</span></div>
+          <div id="gFills" class="events-list"></div>
+        </section>
+      </section>
+    </main>
+
+    <footer class="footer"><span><b>SPOT GRID · PAPER</b> · 不发送真实订单 · 仅用于学习网格机制</span><span id="gSource">spot mark · 2s poll</span></footer>
+  </div>
+  <div id="gToast" class="toast"></div>
+  <div id="gLoading" class="loading">CONNECTING<span>.</span><span>.</span><span>.</span></div>
+  <script src="/static/vendor/lightweight-charts.standalone.production.js?v=tv2"></script>
+  <script src="/static/live-chart-resize.js?v=20261107"></script>
+  <script src="/static/live-ticket.js?v=20261107"></script>
+  <script src="/static/capabilities.js?v=20261107-cap"></script>
+  <script src="/static/ui.js?v=20261107-live-ui"></script>
+  <script src="/static/symbols.js?v=tv2"></script>
+  <script src="/static/market.js?v=account-mode"></script>
+  <script src="/static/volume-pane.js?v=plan3"></script>
+  <script src="/static/grid.js?v=account-mode"></script>
+  <script src="/static/workspace.js?v=account-mode"></script>
+  <script src="/static/layout.js?v=20261107-resize"></script>
+<script src="/static/help-tips.js?v=plan3"></script></body>
+</html>

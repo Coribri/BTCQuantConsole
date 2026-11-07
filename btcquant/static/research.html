@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>事件 × ML 实验室 · BTC Quant</title>
+  <link rel="icon" href="/static/favicon.ico">
+  <link rel="stylesheet" href="/static/styles.css?v=v21ui">
+  <link rel="stylesheet" href="/static/theme.css?v=account-mode">
+  <link rel="stylesheet" href="/static/workspace.css?v=tv2">
+  <link rel="stylesheet" href="/static/research.css?v=tv2">
+<link rel="stylesheet" href="/static/help-tips.css?v=plan3">
+</head>
+<body class="research-page">
+<div class="ambient"></div>
+<div class="app">
+  <header class="topbar">
+    <a class="brand brand-link" href="/"><div class="mark"><img src="/static/logo.png" alt=""></div><div><h1>BTC QUANT</h1><p>MARKET & RESEARCH</p></div></a>
+    <nav class="main-nav" aria-label="主导航"><a href="/">现货</a><a href="/futures">合约</a><a href="/grid">现货网格</a><a href="/research" class="active">事件 × ML</a><a href="/models">模型工坊</a></nav>
+    <div class="top-actions"><span class="lab-local"><i></i> LOCAL RESEARCH</span><button id="settingsBtn" class="lab-btn">DeepSeek 连接设置</button></div>
+  </header>
+  <section class="lab-intro"><div><div class="lab-eyebrow">RESEARCH WORKSPACE / 01</div><h2>先验证信号，再讨论收益。</h2><p>行情特征 × 机器学习 × 事件风控 · 1H / 4H 波段研究</p></div><span class="lab-status">研究阶段 · 未接入自动执行</span></section>
+  <div class="lab-grid">
+    <main class="lab-main">
+      <section class="lab-card experiment-card">
+        <div class="lab-card-head"><div><span class="lab-step">01 / EXPERIMENT</span><h3>配置一次可复现的研究</h3></div><span class="lab-tag">L2 LOGISTIC</span></div>
+        <form id="runForm">
+          <div class="lab-fields">
+            <label>研究币种<select id="labSymbol"><option>BTCUSDT</option><option>ETHUSDT</option><option>BNBUSDT</option><option>XRPUSDT</option><option>TRXUSDT</option><option>DOGEUSDT</option></select></label>
+            <label>信号周期<select id="labInterval"><option value="4h">4H · 持有 16 小时</option><option value="1h">1H · 持有 4 小时</option></select></label>
+            <label>历史样本<select id="labBars"><option value="3000">3000 根</option><option value="5000">5000 根</option><option value="1000">1000 根 · 仅调试</option></select></label>
+            <label>单边手续费 / bps<input id="labFee" type="number" min="0" max="100" step="0.5" value="10" required></label>
+            <label>单边滑点 / bps<input id="labSlip" type="number" min="0" max="100" step="0.5" value="2" required></label>
+            <button id="runBtn" class="lab-primary" type="submit">运行样本外验证 <span>↗</span></button>
+          </div>
+        </form>
+        <div class="lab-method"><span>仅收盘数据</span><span>训练集独立标准化</span><span>三段滚动验证</span><span>下一根开盘成交</span><span>含双边成本</span></div>
+        <div id="jobMessage" class="lab-job" role="status" aria-live="polite">准备就绪。首次运行会下载公开行情，通常需要数十秒。</div>
+      </section>
+
+      <section class="lab-card result-card">
+        <div class="lab-card-head"><div><span class="lab-step">02 / EVIDENCE</span><h3>收益必须经得起对照</h3></div><span id="resultMeta" class="lab-meta">等待第一次研究</span></div>
+        <div id="emptyResult" class="lab-empty"><div class="lab-empty-icon">⌁</div><h4>这里展示真实计算结果</h4><p>运行后，对比趋势基线、ML 过滤与事件风控。<br>没有历史事件时，会明确标注覆盖不足。</p></div>
+        <div id="results" class="hidden">
+          <div class="lab-metrics"><div><span>样本外数据</span><b id="oosRows">—</b></div><div><span>方向准确率 · 非交易胜率</span><b id="accuracy">—</b></div><div><span>Brier · 越低越好</span><b id="brier">—</b></div><div><span>事件覆盖 K 线</span><b id="coverage">—</b></div></div>
+          <div class="lab-chart-head"><span>样本外权益曲线 · 初始 10,000 USDT</span><div><i class="line-key baseline"></i>趋势 <i class="line-key ml"></i>ML <i class="line-key event"></i>ML＋事件</div></div>
+          <svg id="equityChart" viewBox="0 0 800 220" role="img" aria-label="样本外权益曲线"></svg>
+          <div class="table-wrap"><table class="lab-table"><thead><tr><th>方案</th><th>扣费收益</th><th>最大回撤</th><th>交易数</th><th>胜率</th><th>盈亏比率 PF</th></tr></thead><tbody id="comparisonBody"></tbody></table></div>
+          <div id="resultWarnings" class="lab-warnings"></div>
+          <details class="lab-details"><summary>验证区间与模型系数 <span>查看复现信息 ＋</span></summary><div id="foldDetails"></div><div id="featureDetails" class="lab-features"></div></details>
+        </div>
+      </section>
+
+      <section class="lab-card event-card">
+        <div class="lab-card-head"><div><span class="lab-step">03 / EVENT INTELLIGENCE</span><h3>每个事件，都有来源和可用时间</h3></div><div class="lab-actions"><button id="syncBtn" class="lab-btn">↻ 采集公开事件</button><button id="analyzeBtn" class="lab-btn lab-accent">DeepSeek 解析</button></div></div>
+        <p class="lab-subtext">美联储货币政策 RSS / CoinDesk RSS。仅向 DeepSeek 发送公开标题与摘要；每次最多解析 12 条。</p>
+        <div id="eventMessage" class="lab-job" role="status">尚未采集</div>
+        <div id="eventsListLab" class="lab-event-list"></div>
+        <details class="lab-details"><summary>手动录入有来源的事件 <span>可补充监管、交易所、安全事件 ＋</span></summary>
+          <form id="eventForm" class="lab-event-form"><label>标题<input id="eventTitle" minlength="8" maxlength="500" required placeholder="填写实际公开事件的标题"></label><div class="lab-fields two"><label>原文链接<input id="eventUrl" type="url" pattern="https://.*" required placeholder="https://…"></label><label>发布时间 · 香港时间<input id="eventPublished" type="datetime-local" required></label></div><label>公开摘要<textarea id="eventText" maxlength="8000" rows="3" placeholder="粘贴公开内容；保留不确定性和来源，避免包含个人资料。"></textarea></label><button class="lab-btn" type="submit">保存到本地事件库</button></form>
+        </details>
+      </section>
+    </main>
+
+    <aside class="lab-aside">
+      <section class="lab-card signal-card"><span class="lab-step">SIGNAL SNAPSHOT</span><div class="lab-signal-heading"><h3>当前研究信号</h3><span class="lab-tag">非交易指令</span></div><div id="signalDirection" class="lab-direction">—</div><p id="signalReason">等待模型完成。数据更新后需重新运行，快照不会自行下单。</p><div class="lab-score"><span>未来 4 根上涨分数</span><b id="upScore">—</b></div><div class="lab-score-track"><i id="scoreFill"></i></div><div class="lab-score-ends"><span>偏空 ≤ 0.40</span><span>偏多 ≥ 0.60</span></div><div class="lab-checks"><div><span>趋势方向</span><b id="trendCheck">待计算</b></div><div><span>事件否决</span><b id="eventCheck">待计算</b></div><div><span>数据收盘时间</span><b id="signalTime">—</b></div></div><p class="lab-caution">模型分数未经独立校准，不能当成盈利概率。</p></section>
+      <section class="lab-card outlook-card"><span class="lab-step">AI OUTLOOK</span><div class="lab-signal-heading"><h3>AI 多空展望</h3><button id="outlookBtn" class="lab-btn" type="button">生成分析</button></div><p id="outlookHint">配置 DeepSeek 后，结合已收盘行情、研究快照和本地公开事件，给出条件式多空倾向。</p><div id="outlookResult" class="outlook-result hidden"></div></section>
+      <section class="lab-card connection-card"><span class="lab-step">AI CONNECTION</span><div class="lab-connection-title"><i id="aiDot"></i><h3 id="aiStatus">检查 DeepSeek…</h3></div><p id="aiModel">—</p><p>AI 提取事件类型、影响资产、方向假设和风险。模型与固定规则决定是否保留候选信号。</p><button id="settingsBtn2" class="lab-btn">管理本地连接 →</button></section>
+      <section class="lab-card lab-process"><span class="lab-step">HOW IT WORKS</span><h3>一条能追溯的信号链</h3><ol><li><b>公开事件</b><span>原文 / 发布时间 / 采集时间</span></li><li><b>DeepSeek 结构化提取</b><span>事实与影响假设分开记录</span></li><li><b>趋势 + ML 过滤</b><span>动量 / 波动 / 成交量 / 趋势</span></li><li><b>事件风险否决</b><span>高风险或反向事件阻止新信号</span></li><li><b>样本外对照</b><span>先看成本、回撤和样本量</span></li></ol></section>
+    </aside>
+  </div>
+  <footer class="footer"><span>LOCAL RESEARCH · 结果保存在 reports/research · 时间均显示 HKT</span><span>事件不足时不宣称模型有效</span></footer>
+</div>
+<dialog id="settingsDialog" class="lab-dialog"><form id="settingsForm"><div class="lab-card-head"><h3>DeepSeek 连接设置</h3><button type="button" id="closeSettings" class="lab-btn" aria-label="关闭连接设置">×</button></div><p>Key 仅保存在本机 .env，由后端调用 API。浏览器不保存 Key，也不会把账户和持仓发送给 DeepSeek。</p><label>API Key<input id="apiKey" type="password" autocomplete="off" placeholder="未填写时保留现有 Key"></label><label>模型名称<input id="apiModel" value="deepseek-flash" pattern="[a-zA-Z0-9._\-]+" required></label><p>点击“DeepSeek 解析”才会消耗 API 额度。模型名称需与你的 API 账户可用模型一致。</p><div id="settingsMessage" role="status"></div><button type="submit" class="lab-primary">保存本地设置</button></form></dialog>
+<script src="/static/research.js?v=account-mode"></script>
+<script src="/static/help-tips.js?v=plan3"></script><script src="/static/ui.js?v=account-mode"></script></body></html>
