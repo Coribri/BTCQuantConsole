@@ -3,6 +3,32 @@
 **本地优先的数字资产交易与策略研究工作区。**  
 **A local-first workspace for digital-asset trading and strategy research.**
 
+## 一起把它做得更好 / Let's make it better
+
+如果你喜欢 BTC Quant Console，或者它对你有帮助，欢迎在注册 Binance 时使用我的邀请码或邀请链接，支持项目继续维护。**这是作者的推荐链接，是否使用完全自愿，不影响软件使用。**
+
+我会继续打磨体验、完善功能，并逐步支持更多 CEX（中心化交易所）和 DEX（去中心化交易所）。后续也计划推出更多语言版本，探索社区交流功能，和大家一起研究有趣的量化策略与交易机器人。
+
+有建议、问题，或想看到的新功能，欢迎[提交 Issue](https://github.com/Coribri/BTCQuantConsole/issues)。一起交流，一起把它做得更好。
+
+If you enjoy BTC Quant Console or find it useful, you're welcome to use my Binance referral code or link when signing up to support the project's continued development. **This is the maintainer's referral link. Using it is entirely optional and does not affect access to the software.**
+
+I'll keep improving the experience and adding features, with plans to support more centralized exchanges (CEXs), decentralized exchanges (DEXs), and languages. I'd also like to explore community features so we can share ideas and experiment with interesting quantitative strategies and trading bots together.
+
+Suggestions, questions, and feature ideas are always welcome—[open an issue](https://github.com/Coribri/BTCQuantConsole/issues) and help shape what comes next.
+
+**Binance 邀请码 / Referral code：`CPA_006128T6CC`**  
+[Binance 邀请链接 / Binance referral link](https://www.binance.com/activity/referral-entry/CPA?ref=CPA_006128T6CC)
+
+<details>
+<summary>查看邀请二维码 / Show referral QR code</summary>
+
+[![Binance 邀请二维码 / Binance referral QR code](docs/images/binance-invite-qr.png)](https://www.binance.com/activity/referral-entry/CPA?ref=CPA_006128T6CC)
+
+</details>
+
+---
+
 中文说明在前，English follows below.
 
 [中文 API 教程](#api-获取与连接教程) · [English API tutorial](#api-setup-tutorial)  
