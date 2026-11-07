@@ -5,6 +5,13 @@
 
 中文说明在前，English follows below.
 
+## 界面预览 / Interface preview
+
+![BTC Quant Console 1.0 — 现货模拟交易界面 / Spot paper-trading workspace](docs/images/spot-paper-workspace.png)
+
+现货模拟交易界面（PAPER）：市场观察、K 线与成交量图、手动订单和账户概览。  
+Spot paper-trading workspace: market watch, candlestick and volume charts, manual orders and account overview.
+
 ## 中文
 
 ### 项目目标
